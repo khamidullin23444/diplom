@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link type="text/css" href="/static/core/css/main.css" rel="stylesheet"/>
+    <link type="text/css" href="/static/core/css/index.css" rel="stylesheet"/>
+    <link type="text/css" href="/static/core/css/robot_create.css" rel="stylesheet"/>
+    <link type="text/css" href="/static/core/css/robot_charts.css" rel="stylesheet">
+    <title>{{ title if title else "Robot Control System" }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="/static/core/js/canvasjs.min.js"></script>
+    <script src="/static/core/js/jquery-3.7.0.min.js"
+            integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="wrapper">
+    <div class="nav_color">
+        <p class="nav_bar__title nav_bar__el">Кафедра Автоматики и управления КНИТУ-КАИ</p>
+    </div>
+    <main class="content_block">
+        <aside class="nav_bar">
+            {% block mainmenu %}
+                <div style="display: flex; flex-direction: column; align-content: space-evenly">
+                    <div class="bar">
+                        &nbsp;
+                    </div>
+                    <div>
+                        <ul>
+                            <li>
+                                <div style="border: 1px solid #3354C8;">
+                                    <a href="/robot_create/">
+                                        <div class="li__block nav_bar__el ">
+                                            <img src="/static/core/images/add_button.svg" alt="plus">
+                                            Добавить новое устройство
+                                        </div>
+                                    </a>
+                                </div>
+                            </li>
+                            <li>
+                                <div style="border: 1px solid #3354C8;">
+                                    <a href="/">
+                                        <div class="li__block nav_bar__el ">
+                                            <img src="/static/core/images/list.svg" alt="plus">
+                                            Вывести список всех устройств
+
+                                        </div>
+                                    </a>
+
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+            {% endblock %}
+        </aside>
+        <div class="content_body">
+
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+</div>
+
+</body>
+</html>
+

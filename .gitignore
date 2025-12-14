@@ -3,3 +3,4 @@
 /.idea/
 *.pyc
 /back/static/
+back_fastapi/db.sqlite3

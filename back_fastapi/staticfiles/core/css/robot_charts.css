@@ -1,0 +1,41 @@
+.chart {
+    width: 30%;
+    margin-right: 10%;
+    margin-left: 2%;
+}
+.charts {
+    justify-content: space-between;
+    margin-top: -2%;
+}
+.data_block {
+    margin-top: 30%;
+    margin-left: 3%;
+    font-size: 24px;
+    font-weight: 600;
+    display: flex;
+    width: 50%;
+}
+.tr_ceil {
+    padding-right: 2%;
+    padding-bottom: 5%;
+    width: 70%;
+}
+.control_block {
+    width: 50%;
+    margin-left: 10%;
+}
+.button_delete {
+    background-color: #E56666;
+    border: 1px solid #E56666;
+}
+.button_control {
+    width: 90%;
+    margin-bottom: 5%;
+    margin-left: 10%;
+    font-size: 18px;
+    padding: 2%;
+}
+.button_type {
+    background-color: #129FEE;
+    border: 1px solid #129FEE;
+}
