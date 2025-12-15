@@ -23,11 +23,6 @@ back_fastapi/
 │   ├── routers/             # FastAPI роутеры
 │   │   ├── __init__.py
 │   │   └── core.py
-│   ├── mqtt/                # MQTT интеграция
-│   │   ├── __init__.py
-│   │   ├── app_config.py
-│   │   ├── commands_const.py
-│   │   └── service.py
 │   └── enums/               # Перечисления
 │       ├── __init__.py
 │       └── sensor_type_enum.py
