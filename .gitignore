@@ -3,5 +3,5 @@
 /.idea/
 *.pyc
 /back/static/
-back_fastapi/db.sqlite3
 /back/venv/
+/back/db.sqlite3

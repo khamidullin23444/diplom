@@ -1,39 +1,42 @@
 {% extends 'core/base.html' %}
 {% block content %}
-    <div>
-        <h1 class="heading">Добавить новый робот!</h1>
+    <div style="display: flex; justify-content: center; align-items: center; margin: 0;">
+        <h1>Страница на стадии разработки</h1>
     </div>
-    <form action="/robot_create/" method="post">
-        <table class="table_create">
-            <tbody>
-            <tr class="tr_create">
-                <td class="tr_create">
-                    <label for="ipaddr" class="label_font">1. Введите IP-адрес устройства</label>
-                </td>
-                <td>
-                    <input id="ipaddr" type="text" name="ipaddr" maxlength="16" required class="input_create">
-                </td>
-            </tr>
-            <tr class="tr_create">
-                <td class="tr_create">
-                    <label for="token" class="label_font">2. Введите модель:</label>
-                </td>
-                <td>
-                    <input id="token" type="text" name="token" maxlength="16" required class="input_create">
-                </td>
-            </tr>
-            </tbody>
-        </table>
-        <br>
-        <br>
-        <br>
-        <br>
-        <div style="text-align: center">
-            <button type="submit" class="robot_button button_create">Подключить!</button>
-        </div>
-
-
-    </form>
+{#    <div>#}
+{#        <h1 class="heading">Добавить новый робот!</h1>#}
+{#    </div>#}
+{#    <form action="/robot_create/" method="post">#}
+{#        <table class="table_create">#}
+{#            <tbody>#}
+{#            <tr class="tr_create">#}
+{#                <td class="tr_create">#}
+{#                    <label for="ipaddr" class="label_font">1. Введите IP-адрес устройства</label>#}
+{#                </td>#}
+{#                <td>#}
+{#                    <input id="ipaddr" type="text" name="ipaddr" maxlength="16" required class="input_create">#}
+{#                </td>#}
+{#            </tr>#}
+{#            <tr class="tr_create">#}
+{#                <td class="tr_create">#}
+{#                    <label for="token" class="label_font">2. Введите модель:</label>#}
+{#                </td>#}
+{#                <td>#}
+{#                    <input id="token" type="text" name="token" maxlength="16" required class="input_create">#}
+{#                </td>#}
+{#            </tr>#}
+{#            </tbody>#}
+{#        </table>#}
+{#        <br>#}
+{#        <br>#}
+{#        <br>#}
+{#        <br>#}
+{#        <div style="text-align: center">#}
+{#            <button type="submit" class="robot_button button_create">Подключить!</button>#}
+{#        </div>#}
+{##}
+{##}
+{#    </form>#}
 
 {% endblock %}
 

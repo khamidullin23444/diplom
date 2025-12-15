@@ -40,7 +40,6 @@ body {
 }
 
 .content_body {
-    margin-top: -2%;
     padding: 0;
     width: 100%;
 }
@@ -61,6 +60,7 @@ ul {
     display: flex;
     text-align: center;
     align-items: center;
+    justify-content: space-evenly;
 }
 
 .bar {

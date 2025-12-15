@@ -18,10 +18,3 @@ static_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "staticfi
 if os.path.exists(static_path):
     app.mount("/static", StaticFiles(directory=static_path), name="static")
 
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Остановка MQTT клиента при завершении приложения"""
-    mqtt_client.loop_stop()
-    mqtt_client.disconnect()
-
