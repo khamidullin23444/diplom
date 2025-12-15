@@ -1,7 +1,6 @@
 import json
-import base64
 import os
-from datetime import date, datetime
+from datetime import date
 from typing import List, Dict
 from fastapi import APIRouter, Depends, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
@@ -11,8 +10,6 @@ from sqlalchemy import desc
 
 from app.database import get_db
 from app.models import Robot, Sensor, Battery
-from app.schemas.robot import RobotCreate, RobotResponse, RobotDataResponse
-from app.schemas.sensor import SensorData
 from app.enums import SensorTypeEnum
 
 router = APIRouter()
@@ -185,13 +182,4 @@ async def robot_data(robot: int, db: Session = Depends(get_db)):
     }
     
     return JSONResponse(content=robot_data_response)
-
-
-# @router.post("/publish/")
-# async def publish_message(request: Request):
-#     """Публикация сообщения через MQTT"""
-#     request_data = await request.json()
-#     msg = base64.b64encode(bytes(request_data['msg'], 'utf-8'))
-#     rc, mid = mqtt_client.publish(request_data['topic'], msg)
-#     return JSONResponse(content={'code': rc})
 
