@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+{% block title %}Релаксометр ПМР‑NP2 — Анализ{% endblock %}
+
+{% block head_extra %}
+  <link rel="stylesheet" href="{{ url_for('static', path='css/analyzer.css') }}">
+{% endblock %}
+
+{% block body_extra_scripts %}
+  <script src="{{ url_for('static', path='js/analyzer.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="analyzer-root">
+  <!-- Верхняя панель заголовка / состояния -->
+  <header class="analyzer-header">
+    <div class="header-title">
+      <h1>Релаксометр ПМР‑NP2</h1>
+    </div>
+    <div class="header-status">
+      <span class="status-label">Состояние:</span>
+      <span class="status-value" id="pmra-state">
+        {{ state_text | default("ожидание") }}
+      </span>
+    </div>
+  </header>
+
+  <!-- Основная рабочая область: левый график + правые графики/результаты -->
+  <main class="analyzer-main">
+    <!-- Левый основной график (Sensor_Scope) -->
+    <section class="panel panel-chart panel-chart-left">
+      <div class="panel-header">
+        <h2>Сигнал релаксации</h2>
+        <div class="panel-subtitle">
+          Время (мс) × Амплитуда СЭ (у.е.)
+        </div>
+      </div>
+      <div id="sensor-scope" class="chart-surface"
+           data-chart-type="relax-signal">
+        <!-- SciChart.js будет инициализирован в analyzer.js -->
+      </div>
+    </section>
+
+    <!-- Правые два графика и блок параметров -->
+    <section class="panel panel-right">
+      <!-- Верхний правый график (Sensor_Scope2) -->
+      <div class="panel panel-chart panel-chart-top-right">
+        <div class="panel-header">
+          <h2>Дополнительный сигнал</h2>
+          <div class="panel-subtitle">
+            Время (мс) × Амплитуда СЭ (у.е.)
+          </div>
+        </div>
+        <div id="sensor-scope-2" class="chart-surface"
+             data-chart-type="relax-signal-2">
+          <!-- SciChart.js (или другая JS‑библиотека) -->
+        </div>
+      </div>
+
+      <!-- Нижний правый график (Sensor_Scope3) -->
+      <div class="panel panel-chart panel-chart-bottom-right">
+        <div class="panel-header">
+          <h2>Графики зависимостей</h2>
+          <div class="panel-subtitle">
+            X × Y (результаты обработки)
+          </div>
+        </div>
+        <div id="sensor-scope-3" class="chart-surface"
+             data-chart-type="analysis">
+          <!-- SciChart.js (или аналог) -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Нижняя панель управления и результатов анализа -->
+    <section class="panel panel-bottom">
+      <!-- Левая часть: управление измерением / аппаратурой -->
+      <div class="panel panel-controls">
+        <h2>Параметры измерения</h2>
+
+        <div class="controls-row">
+          <div class="control-group">
+            <label for="pc-freq">5. Частота, МГц</label>
+            <div class="control-inline">
+              <button type="button" class="btn btn-small"
+                      data-action="freq-minus-50">-50</button>
+              <button type="button" class="btn btn-small"
+                      data-action="freq-minus-1">-1</button>
+              <input id="pc-freq" name="pc_freq" type="number" step="0.01"
+                     value="{{ params.freq | default(13.95) }}"
+                     class="input-small" />
+              <span class="unit">MHz</span>
+              <button type="button" class="btn btn-small"
+                      data-action="freq-plus-1">+1</button>
+              <button type="button" class="btn btn-small"
+                      data-action="freq-plus-50">+50</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>8. Усиление</label>
+            <div class="control-inline">
+              <input id="gain" name="gain" type="range"
+                     min="0" max="255"
+                     value="{{ params.gain | default(1) }}" />
+              <span id="gain-value" class="value-indicator">
+                {{ params.gain | default(1) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <div class="control-group">
+            <label>1. Период запуска</label>
+            <div class="control-inline">
+              <input id="mc-period" name="mc_period" type="range"
+                     min="0" max="255"
+                     value="{{ params.mc_period | default(500) }}" />
+              <span id="mc-period-text" class="value-indicator">
+                {{ params.mc_period | default(500) }} ms
+              </span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>2. Интервал 90‑180, мкс</label>
+            <div class="control-inline">
+              <input id="t90-180" name="t90_180" type="range"
+                     min="0" max="255"
+                     value="{{ params.t90_180 | default(500) }}" />
+              <span id="t90-180-text" class="value-indicator">
+                {{ params.t90_180 | default(500) }} μs
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <div class="control-group">
+            <label>3. Число 180 импульсов</label>
+            <div class="control-inline">
+              <input id="pulse-count" name="pulse_count" type="range"
+                     min="0" max="255"
+                     value="{{ params.pulse_count | default(10) }}" />
+              <span id="pulse-count-text" class="value-indicator">
+                {{ params.pulse_count | default(10) }}
+              </span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>4. Число накоплений</label>
+            <div class="control-inline">
+              <input id="accumulations" name="accumulations" type="range"
+                     min="0" max="255"
+                     value="{{ params.accumulations | default(1) }}" />
+              <span id="accumulations-text" class="value-indicator">
+                {{ params.accumulations | default(1) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls-row controls-row-buttons">
+          <button type="button" class="btn btn-primary"
+                  id="btn-start">Старт</button>
+          <button type="button" class="btn"
+                  id="btn-stop">Стоп</button>
+          <button type="button" class="btn btn-secondary"
+                  id="btn-analyze">Анализ</button>
+          <button type="button" class="btn"
+                  id="btn-auto">Авто</button>
+        </div>
+
+        <div class="controls-row controls-row-connection">
+          <div class="control-group">
+            <label for="com-port">COM‑порт</label>
+            <div class="control-inline">
+              <select id="com-port" name="com_port">
+                {% for port in com_ports %}
+                  <option value="{{ port.name }}"
+                          {% if port.name == selected_com_port %}selected{% endif %}>
+                    {{ port.label }}
+                  </option>
+                {% endfor %}
+              </select>
+              <button type="button" class="btn btn-small"
+                      id="btn-refresh-ports">...</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Соединение</label>
+            <button type="button"
+                    id="btn-toggle-connection"
+                    class="toggle {{ 'toggle-on' if connected else 'toggle-off' }}">
+              {{ 'Connect' if not connected else 'Disconnect' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="controls-row controls-row-progress">
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-bar-fill"
+                   id="progress-bar-fill"
+                   style="width: {{ progress_percent | default(0) }}%;"></div>
+            </div>
+            <div class="progress-meta">
+              <span id="progress-percent">
+                {{ progress_percent | default(0) }}%
+              </span>
+              <span id="progress-savings">
+                {{ progress_savings | default("0/0") }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Средняя часть: выбор зависимостей и файлов -->
+      <div class="panel panel-dependences">
+        <h2>Зависимости и результаты</h2>
+
+        <div class="dependence-row">
+          <button type="button" class="btn btn-wide"
+                  id="btn-change-graph">
+            Отобразить зависимость
+          </button>
+        </div>
+
+        <div class="dependence-row">
+          <select id="dependences-list" name="dependence"
+                  size="8" class="dependence-list">
+            {% set deps = dependences or [
+              "Зависимость скорости потока от Асэ",
+              "Зависимость расхода воды от T2*",
+              "Зависимость скорости потока от T2*",
+              "Зависимость концентрации воды от T2*",
+              "Концентрация воды в СКЖ по A1/Aст",
+              "Концентрация воды по населенности протонов",
+              "Плотность нефти от T2",
+              "Молекулярная масса нефти от R2в",
+              "Вязкость нефти от T2",
+              "Вязкость нефти от населенностей протонов",
+              "Температура застывания нефти от Т2а",
+              "Температура застывания ДТ от Т2а",
+              "Концентрация АС от Т2а"
+            ] %}
+            {% for dep in deps %}
+              <option value="{{ loop.index0 }}">{{ dep }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="dependence-row dependence-row-files">
+          <div class="file-actions">
+            <button type="button" class="btn"
+                    id="btn-save-result">
+              Сохранить результат
+            </button>
+            <button type="button" class="btn"
+                    id="btn-load-result">
+              Прочитать результаты
+            </button>
+            <button type="button" class="btn"
+                    id="btn-find-result">
+              Найти результаты
+            </button>
+          </div>
+          <div class="file-history">
+            <select id="history-list" name="history"
+                    class="history-select">
+              {% for item in history %}
+                <option value="{{ item.id }}">{{ item.label }}</option>
+              {% endfor %}
+            </select>
+            <button type="button" class="btn btn-small"
+                    id="btn-select-dir">...</button>
+          </div>
+          <div class="dialog-output">
+            <textarea id="dialog-text" readonly>
+{{ dialog_text | default("Показать результаты анализа") }}
+            </textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Правая нижняя часть: параметры нефти и расчеты T2/W -->
+      <div class="panel panel-oil">
+        <h2>Параметры нефти и расчёты</h2>
+
+        <div class="oil-params">
+          <textarea id="oil-params-1" readonly>
+Плотность тяжелой нефти: {{ oil.heavy_density | default(0) }} кг/м³
+Плотность лёгкой нефти : {{ oil.light_density | default(0) }} кг/м³
+ММ тяжёлой нефти       : {{ oil.heavy_mm | default(0) }} а.е.м
+ММ лёгкой нефти        : {{ oil.light_mm | default(0) }} а.е.м
+Вязкость от R2a        : {{ oil.viscosity_r2a | default(0) }} мПас
+Вязкость от P2a        : {{ oil.viscosity_p2a | default(0) }} мПас
+C(a/c)                 : {{ oil.c_ac | default(0) }} %
+          </textarea>
+
+          <textarea id="oil-params-2" readonly>
+{{ oil.extra_block_1 | default("") }}
+          </textarea>
+
+          <textarea id="oil-params-3" readonly>
+{{ oil.extra_block_2 | default("") }}
+          </textarea>
+        </div>
+
+        <div class="relax-params">
+          <div class="relax-block">
+            <h3>Время релаксации</h3>
+            <div class="relax-text">
+              T2a = {{ relax.t2a | default(0) }} ms<br>
+              T2b = {{ relax.t2b | default(0) }} ms<br>
+              T2c = {{ relax.t2c | default(0) }} ms
+            </div>
+          </div>
+
+          <div class="relax-block">
+            <h3>Амплитуда</h3>
+            <div class="relax-text">
+              Aa = {{ relax.aa | default(0) }}<br>
+              Ab = {{ relax.ab | default(0) }}<br>
+              Ac = {{ relax.ac | default(0) }}
+            </div>
+          </div>
+
+          <div class="relax-block">
+            <h3>Населенность, %</h3>
+            <div class="relax-text">
+              P2a = {{ relax.p2a | default(0) }} %<br>
+              P2b = {{ relax.p2b | default(0) }} %<br>
+              P2c = {{ relax.p2c | default(0) }} %
+            </div>
+          </div>
+        </div>
+
+        <div class="relax-calc">
+          <div class="relax-calc-row">
+            <button type="button" class="btn"
+                    id="btn-calc-t2eff">
+              Найти эфф. время релаксации
+            </button>
+            <input id="t2-eff-out" type="text" readonly
+                   value="{{ relax.t2eff | default('') }}"
+                   class="input-small" />
+          </div>
+
+          <div class="relax-calc-row">
+            <div class="relax-calc-inputs">
+              <label for="t2-oil-input">T2н, мс</label>
+              <input id="t2-oil-input" type="number" step="0.01"
+                     value="{{ relax.t2_oil | default(50) }}" />
+
+              <label for="t2-water-input">T2в, мс</label>
+              <input id="t2-water-input" type="number" step="0.01"
+                     value="{{ relax.t2_water | default(50) }}" />
+            </div>
+            <div class="relax-calc-water">
+              <button type="button" class="btn"
+                      id="btn-calc-water-conc">
+                Рассчитать концентрацию воды по T2в, T2н, T2*
+              </button>
+              <label for="w-conc-output">W, %</label>
+              <input id="w-conc-output" type="text" readonly
+                     value="{{ relax.water_conc | default('') }}"
+                     class="input-small" />
+            </div>
+          </div>
+        </div>
+
+        <div class="power-results">
+          <div class="power-item">
+            <span>Pп, Вт</span>
+            <input id="p-power-out" type="text" readonly
+                   value="{{ power.p_sply | default('') }}"
+                   class="input-small" />
+          </div>
+          <div class="power-item">
+            <span>Pкпмг, Вт</span>
+            <input id="p-kpmg-out" type="text" readonly
+                   value="{{ power.p_kpmg | default('') }}"
+                   class="input-small" />
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+{% endblock %}
+
+

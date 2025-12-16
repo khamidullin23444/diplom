@@ -183,3 +183,45 @@ async def robot_data(robot: int, db: Session = Depends(get_db)):
     
     return JSONResponse(content=robot_data_response)
 
+@router.get("/analyzer", response_class=HTMLResponse)
+async def analyzer_index(request: Request, db: Session = Depends(get_db)):
+    template = templates.get_template("core/analyzer.html")
+
+    params = {
+        "gain": 2,
+        "mc_period": 3,
+        "t90_180": 4,
+        "pulse_count": 5,
+        "accumulations": 6,
+    }
+    oil = {
+        "heavy_density": 1,
+        "light_density": 2,
+        "heavy_mm": 3,
+        "light_mm": 4,
+        "viscosity_r2a": 5,
+        "viscosity_p2a": 6,
+        "c_ac": 7,
+        "extra_block_1": 8,
+        "extra_block_2": 9,
+    }
+    relax = {
+        "t2a": 1,
+        "t2b": 2,
+        "t2c": 3,
+        "aa": 4,
+        "ab": 5,
+        "ac": 6,
+        "p2a": 7,
+        "p2b": 8,
+        "p2c": 9,
+        "t2eff": 10,
+        "t2_oil": 11,
+        "t2_water": 12,
+        "water_conc": 13,
+    }
+    power = {
+        "p_sply": 1,
+        "p_kpmg": 2,
+    }
+    return HTMLResponse(content=template.render(request=request, params=params, oil=oil, relax=relax, power=power))
