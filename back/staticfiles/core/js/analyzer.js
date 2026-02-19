@@ -2,8 +2,10 @@
 // Логика для страницы анализа релаксограммы.
 // Предназначено для использования в FastAPI + Jinja2.
 
+
+
 // ---------------- ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ----------------
-const { SciChartSurface, NumericAxis, FastLineRenderableSeries, XyDataSeries } = SciChart;
+
 document.addEventListener("DOMContentLoaded", () => {
   initControls();
   initCharts();
@@ -166,7 +168,8 @@ function bindStepButtons(buttonId, inputId, delta) {
 // ---------------- ИНИЦИАЛИЗАЦИЯ ГРАФИКОВ ----------------
 
 async function initCharts() {
-  if (typeof scichart === "undefined") {
+  console.log(SciChart)
+  if (typeof SciChart === "undefined") {
     console.warn("SciChart.js не найден (объект scichart не определён). Пропускаю инициализацию графиков.");
     return;
   }
@@ -187,7 +190,7 @@ async function initCharts() {
     YAxisDragModifier,
     RolloverModifier,
     VerticalLineAnnotation
-  } = scichart;
+  } = SciChart;
 
   // Основной левый график (Sensor_Scope): логарифмическая ось Y, два набора точек
   if (document.getElementById("sensor-scope")) {
