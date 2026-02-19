@@ -1,0 +1,42 @@
+# PyTorch with CUDA support for RTX 5060 Ti
+torch>=2.0.0
+torchvision>=0.15.0
+
+# YOLOv8
+ultralytics>=8.0.0
+
+# LangGraph для мультиагентной системы
+langgraph>=0.0.40
+langchain>=0.1.0
+langchain-community>=0.0.10
+
+# LLM модели (HuggingFace Transformers)
+transformers>=4.36.0
+accelerate>=0.25.0
+sentencepiece>=0.1.99
+
+# Ollama поддержка (опционально)
+# ollama>=0.1.0  # Раскомментируйте если используете Ollama
+
+# Roboflow for dataset download
+roboflow>=1.1.0
+
+# Image processing
+Pillow>=10.0.0
+opencv-python>=4.8.0
+numpy>=1.24.0
+
+# Configuration
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+python-dotenv>=1.0.0
+
+# Utilities
+tqdm>=4.66.0
+pyyaml>=6.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Optional: for better visualization
+pandas>=2.0.0
+
