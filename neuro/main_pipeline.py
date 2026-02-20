@@ -58,6 +58,12 @@ def print_results(result: dict):
         if lexical.get("tokens"):
             print(f"    • Токены: {', '.join(lexical['tokens'][:10])}{'...' if len(lexical['tokens']) > 10 else ''}")
     
+    # Транслитерация
+    translit = final_result.get("transliteration", "")
+    if translit:
+        print(f"\n  🔤 ТРАНСЛИТЕРАЦИЯ:")
+        print(f"    {translit}")
+    
     # Итог
     print(f"\n✅ Статус: {'Успешно' if result.get('summary', {}).get('success') else 'Ошибка'}")
     print("="*70)

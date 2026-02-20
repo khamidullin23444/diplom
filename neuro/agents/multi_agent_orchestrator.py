@@ -5,6 +5,7 @@ from typing import TypedDict, Dict, Any, List, Optional
 from langgraph.graph import StateGraph, START, END
 from .ocr_agent import OCRAgent
 from .llm_correction_agent import LLMCorrectionAgent
+from .transliteration_agent import TransliterationAgent
 
 
 class PipelineState(TypedDict):
@@ -17,6 +18,7 @@ class PipelineState(TypedDict):
     corrections: List[Dict[str, Any]]
     lexical_analysis: Dict[str, Any]
     confidence_score: float
+    transliteration: str
     final_result: Dict[str, Any]
     error: str
 
@@ -52,6 +54,7 @@ class MultiAgentOrchestrator:
             model_type=llm_model_type,
             device=llm_device
         )
+        self.translit_agent = TransliterationAgent()
         print("✓ Агенты инициализированы")
     
     def ocr_step(self, state: PipelineState) -> PipelineState:
@@ -133,6 +136,43 @@ class MultiAgentOrchestrator:
             state["error"] = f"LLM ошибка: {llm_state['error']}"
         
         return state
+
+    def translit_step(self, state: PipelineState) -> PipelineState:
+        """
+        Шаг 3: Транслитерация распознанного/исправленного текста.
+
+        Args:
+            state: Текущее состояние пайплайна
+
+        Returns:
+            Обновлённое состояние с полем transliteration
+        """
+        print("\n" + "=" * 60)
+        print("ШАГ 3: ТРАНСЛИТЕРАЦИЯ")
+        print("=" * 60)
+
+        if state.get("error"):
+            print(f"⚠ Пропуск шага транслитерации из-за ошибки: {state['error']}")
+            return state
+
+        # В качестве основы берём уже исправленный текст, если он есть,
+        # иначе — сырой текст OCR (например, последовательность классов).
+        text_for_translit = state.get("corrected_text") or state.get("raw_text", "")
+
+        translit_state = {
+            "raw_text": text_for_translit,
+            "transliteration": "",
+            "error": "",
+        }
+
+        translit_state = self.translit_agent.transliterate(translit_state)
+
+        if translit_state.get("error"):
+            state["error"] = f"Ошибка транслитерации: {translit_state['error']}"
+        else:
+            state["transliteration"] = translit_state.get("transliteration", "")
+
+        return state
     
     def finalize_step(self, state: PipelineState) -> PipelineState:
         """
@@ -145,7 +185,7 @@ class MultiAgentOrchestrator:
             Финальное состояние с результатами
         """
         print("\n" + "="*60)
-        print("ШАГ 3: ФИНАЛИЗАЦИЯ")
+        print("ШАГ 4: ФИНАЛИЗАЦИЯ")
         print("="*60)
         
         # Формирование финального результата
@@ -170,7 +210,8 @@ class MultiAgentOrchestrator:
                 "success": not bool(state.get("error")),
                 "error": state.get("error", ""),
                 "total_processing_time": "N/A"  # Можно добавить измерение времени
-            }
+            },
+            "transliteration": state.get("transliteration", ""),
         }
         
         state["final_result"] = final_result
@@ -192,12 +233,14 @@ class MultiAgentOrchestrator:
         # Добавление узлов
         workflow.add_node("ocr_step", self.ocr_step)
         workflow.add_node("llm_step", self.llm_step)
+        workflow.add_node("translit_step", self.translit_step)
         workflow.add_node("finalize", self.finalize_step)
         
         # Определение потока обработки
         workflow.add_edge(START, "ocr_step")
         workflow.add_edge("ocr_step", "llm_step")
-        workflow.add_edge("llm_step", "finalize")
+        workflow.add_edge("llm_step", "translit_step")
+        workflow.add_edge("translit_step", "finalize")
         workflow.add_edge("finalize", END)
         
         print("✓ Пайплайн создан")

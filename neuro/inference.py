@@ -22,7 +22,7 @@ def recognize_text(
     image_path,
     conf_threshold=0.25,
     save_results=True,
-    output_dir="results"
+    output_dir="results",
 ):
     """
     Распознает текст на изображении используя обученную модель YOLOv8
@@ -133,12 +133,17 @@ def recognize_text(
     return results_list
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Распознавание старотатарского текста на изображениях")
+    parser = argparse.ArgumentParser(
+        description=(
+            "Распознавание старотатарского текста на изображениях одной моделью YOLOv8.\n"
+            "Можно использовать любую из обученных моделей: строк (lines), слов (words) или символов (symbols)."
+        )
+    )
     parser.add_argument(
         "--model",
         type=str,
-        default="runs/detect/old_tatar_yolov8/weights/best.pt",
-        help="Путь к обученной модели"
+        default="runs/symbols/symbols_yolov8x/weights/best.pt",
+        help="Путь к обученной модели (по умолчанию модель символов каскада)"
     )
     parser.add_argument(
         "--source",

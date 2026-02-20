@@ -7,7 +7,7 @@
 
 ## Описание
 
-Этот проект реализует систему оптического распознавания символов (OCR) для старотатарского языка, использующего арабскую письменность. Модель основана на архитектуре YOLOv8 и обучена на датасете Old Tatar.
+Этот проект реализует систему оптического распознавания символов (OCR) для старотатарского языка, использующего арабскую письменность. Ядро системы — каскад из трёх моделей YOLOv8 (строки → слова → символы), согласованный с архитектурой из статьи Валишина И.А.
 
 ### ✨ Новое: Мультиагентная система
 
@@ -97,54 +97,58 @@ print(f"Устройство: {torch.cuda.get_device_name(0) if torch.cuda.is_av
 2. Перейдите в Settings -> API
 3. Скопируйте ваш API ключ
 
-### 2. Загрузка датасета
+### 2. Загрузка датасетов
 
 #### Вариант 1: Использование переменной окружения (рекомендуется)
 
 ```bash
 # Windows PowerShell
 $env:ROBOFLOW_API_KEY="ваш_api_ключ"
-python download_dataset.py
 
 # Windows CMD
 set ROBOFLOW_API_KEY=ваш_api_ключ
-python download_dataset.py
 
 # Linux/macOS
 export ROBOFLOW_API_KEY="ваш_api_ключ"
-python download_dataset.py
+
+# Общий датасет (старое поведение)
+python download_dataset.py --task generic
+
+# Три специализированных датасета: строки, слова, символы
+python download_dataset.py --task all
 ```
-
-#### Вариант 2: Прямое указание в коде
-
-Откройте `download_dataset.py` и раскомментируйте строку:
-
-```python
-download_dataset(api_key="ваш_api_ключ_здесь")
-```
-
-Датасет будет загружен в папку `dataset/` в формате YOLOv8.
 
 ## Обучение модели
 
-### Базовое обучение
+### Вариант A: Универсальное обучение (одна модель, старое поведение)
 
 ```bash
-python train.py
+python train.py --task generic \
+    --data_yaml dataset/data.yaml \
+    --epochs 100 \
+    --imgsz 640 \
+    --batch 16 \
+    --model_size n
 ```
 
-### Настройка параметров обучения
+### Вариант B: Каскад из трёх моделей (как в статье)
 
-Откройте `train.py` и измените параметры в функции `train_model()`:
+`train.py` содержит пресеты для трёх задач:
 
-```python
-train_model(
-    data_yaml="dataset/data.yaml",  # Путь к конфигурации датасета
-    epochs=100,                      # Количество эпох (рекомендуется 100-200)
-    imgsz=640,                       # Размер изображений (640 - стандартный)
-    batch=16,                        # Размер батча (для RTX 5060 Ti: 16-32)
-    model_size="n",                  # Размер модели: n, s, m, l, x
-)
+- `lines`   — модель строк (YOLOv8n);
+- `words`   — модель слов (YOLOv8n);
+- `symbols` — модель символов (YOLOv8x).
+
+Обучение всех трёх моделей подряд:
+
+```bash
+python train.py --task all
+```
+
+Обучение только одной задачи (пример для строк):
+
+```bash
+python train.py --task lines
 ```
 
 ### Рекомендации по параметрам для RTX 5060 Ti
@@ -161,10 +165,17 @@ train_model(
 
 ### Мониторинг обучения
 
-Во время обучения результаты сохраняются в папке `runs/detect/old_tatar_yolov8/`:
+Во время обучения результаты сохраняются в подпапках `runs/...` в зависимости от задачи:
 
-- `weights/best.pt` - лучшая модель
-- `weights/last.pt` - последний чекпоинт
+- `runs/detect/old_tatar_yolov8/` — для режима `generic`;
+- `runs/lines/lines_yolov8n/` — модель строк;
+- `runs/words/words_yolov8n/` — модель слов;
+- `runs/symbols/symbols_yolov8x/` — модель символов.
+
+Каждый эксперимент содержит:
+
+- `weights/best.pt` - лучшая модель;
+- `weights/last.pt` - последний чекпоинт;
 - `results.png` - графики метрик
 - `confusion_matrix.png` - матрица ошибок
 - `train_batch*.jpg` - примеры батчей обучения
@@ -183,23 +194,40 @@ model.train(resume=True)
 
 ## Использование обученной модели
 
-### Вариант 1: Standalone OCR (только распознавание)
+### Вариант 1: Standalone OCR (только распознавание одной моделью)
 
 ```bash
-python inference.py --source path/to/image.jpg --model runs/detect/old_tatar_yolov8/weights/best.pt
+python inference.py --source path/to/image.jpg --model runs/symbols/symbols_yolov8x/weights/best.pt
 ```
 
-### Вариант 2: Мультиагентная система (OCR + LLM коррекция) ⭐ Рекомендуется
+### Вариант 2: Каскад строк → слов → символов (как в статье)
+
+```bash
+python cascade_inference.py --image path/to/image.jpg
+```
+
+При необходимости можно явно указать пути к трём моделям каскада:
+
+```bash
+python cascade_inference.py \
+    --image path/to/image.jpg \
+    --lines-model runs/lines/lines_yolov8n/weights/best.pt \
+    --words-model runs/words/words_yolov8n/weights/best.pt \
+    --symbols-model runs/symbols/symbols_yolov8x/weights/best.pt
+```
+
+### Вариант 3: Мультиагентная система (OCR + LLM коррекция + транслитерация) ⭐ Рекомендуется
 
 ```bash
 python main_pipeline.py --image path/to/image.jpg
 ```
 
 Мультиагентная система автоматически:
-1. Распознает текст с помощью OCR
-2. Исправляет ошибки с помощью LLM
-3. Проводит лексический анализ
-4. Выводит детальные результаты
+1. Распознает текст с помощью OCR;
+2. Исправляет ошибки с помощью LLM;
+3. Проводит лексический анализ;
+4. Выполняет транслитерацию распознанного текста;
+5. Выводит детальные результаты.
 
 Подробнее см. [AGENTS_README.md](AGENTS_README.md)
 
@@ -285,7 +313,8 @@ teuro/
 ├── download_dataset.py    # Скрипт загрузки датасета
 ├── train.py               # Скрипт обучения модели
 ├── inference.py           # Скрипт распознавания (standalone)
-├── main_pipeline.py        # Главный файл мультиагентной системы
+├── cascade_inference.py   # Каскад строк → слов → символов
+├── main_pipeline.py       # Главный файл мультиагентной системы
 ├── validate.py            # Скрипт валидации модели
 ├── export_model.py        # Скрипт экспорта модели
 ├── example_usage.py       # Примеры использования
@@ -296,9 +325,10 @@ teuro/
 ├── .gitignore            # Git ignore файл
 ├── agents/               # Модуль агентов
 │   ├── __init__.py
-│   ├── ocr_agent.py      # OCR агент (YOLOv8)
-│   ├── llm_correction_agent.py  # LLM агент коррекции
-│   └── multi_agent_orchestrator.py  # Оркестратор
+│   ├── ocr_agent.py               # OCR агент (YOLOv8)
+│   ├── llm_correction_agent.py    # LLM агент коррекции
+│   ├── transliteration_agent.py   # Агент транслитерации
+│   └── multi_agent_orchestrator.py  # Оркестратор LangGraph
 ├── config/               # Конфигурация
 │   └── settings.py
 ├── dataset/              # Датасет (создается после загрузки)

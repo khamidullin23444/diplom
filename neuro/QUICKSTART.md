@@ -21,7 +21,7 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 pip install -r requirements.txt
 ```
 
-## 2. Загрузка датасета
+## 2. Загрузка датасетов
 
 ```bash
 # Установите переменную окружения с API ключом Roboflow
@@ -34,32 +34,46 @@ set ROBOFLOW_API_KEY=ваш_api_ключ
 # Linux/macOS:
 export ROBOFLOW_API_KEY="ваш_api_ключ"
 
-# Загрузка датасета
-python download_dataset.py
+# Общий датасет (generic)
+python download_dataset.py --task generic
+
+# Все три специализированных датасета (строки, слова, символы)
+python download_dataset.py --task all
 ```
 
-## 3. Обучение модели
+## 3. Обучение моделей
+
+### Вариант A: Одна универсальная модель (как раньше)
 
 ```bash
-# Базовое обучение (начните с nano модели для быстрого теста)
-python train.py
+python train.py --task generic
 ```
 
-Для настройки параметров откройте `train.py` и измените значения в функции `train_model()`.
+### Вариант B: Каскад из трёх моделей (строки → слова → символы)
+
+```bash
+python train.py --task all
+```
 
 ## 4. Распознавание текста
 
-### Вариант A: Standalone OCR (только распознавание)
+### Вариант A: Каскад (строки → слова → символы, как в статье)
 
 ```bash
-# Распознавание на одном изображении
-python inference.py --source path/to/image.jpg
-
-# Распознавание на папке с изображениями
-python inference.py --source path/to/images/
+python cascade_inference.py --image path/to/image.jpg
 ```
 
-### Вариант B: Мультиагентная система (OCR + LLM коррекция) ⭐
+### Вариант B: Standalone OCR (одна модель)
+
+```bash
+# Распознавание на одном изображении (например, модель символов)
+python inference.py --source path/to/image.jpg --model runs/symbols/symbols_yolov8x/weights/best.pt
+
+# Распознавание на папке с изображениями
+python inference.py --source path/to/images/ --model runs/symbols/symbols_yolov8x/weights/best.pt
+```
+
+### Вариант C: Мультиагентная система (OCR + LLM коррекция) ⭐
 
 ```bash
 # Базовое использование
