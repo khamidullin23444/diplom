@@ -18,6 +18,7 @@ dataset/
 
 # Training results
 runs/
+runs2/
 results/
 *.pt
 *.pth

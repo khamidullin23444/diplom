@@ -23,22 +23,22 @@ TASK_PROJECTS = {
     },
     "lines": {
         "workspace": "lab-ovmmc",
-        "project": "old-tatar-lines",
-        "version": 1,
+        "project": "old-tatar-crop-lines",
+        "version": 3,
         "target_dir": "dataset/lines",
     },
     "words": {
         "workspace": "lab-ovmmc",
         "project": "old-tatar-words",
-        "version": 1,
+        "version": 2,
         "target_dir": "dataset/words",
     },
-    "symbols": {
-        "workspace": "lab-ovmmc",
-        "project": "old-tatar-symbols",
-        "version": 1,
-        "target_dir": "dataset/symbols",
-    },
+    # "symbols": {
+    #     "workspace": "lab-ovmmc",
+    #     "project": "old-tatar-symbols",
+    #     "version": 1,
+    #     "target_dir": "dataset/symbols",
+    # },
 }
 
 

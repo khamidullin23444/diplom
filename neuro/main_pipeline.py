@@ -92,7 +92,7 @@ def main():
     parser.add_argument(
         "--ocr-conf",
         type=float,
-        default=0.25,
+        default=0.1,
         help="Порог уверенности для OCR (0.0-1.0)"
     )
     

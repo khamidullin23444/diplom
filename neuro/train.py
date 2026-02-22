@@ -19,30 +19,30 @@ from pathlib import Path
 TASK_PRESETS = {
     # Модель распознавания строк (YOLOv8n, ~30 эпох, ~736x736)
     "lines": {
-        "data_yaml": "dataset/lines/data.yaml",
+        "data_yaml": "datalines/data.yaml",
         "epochs": 30,
         "imgsz": 736,
-        "batch": 16,
+        "batch": 8,
         "model_size": "n",
         "project": "runs/lines",
         "name": "lines_yolov8n",
     },
     # Модель распознавания слов (YOLOv8n, ~50 эпох, ~640x640)
     "words": {
-        "data_yaml": "dataset/words/data.yaml",
+        "data_yaml": "datawords/data.yaml",
         "epochs": 50,
         "imgsz": 640,
-        "batch": 16,
+        "batch": 8,
         "model_size": "n",
         "project": "runs/words",
         "name": "words_yolov8n",
     },
     # Модель распознавания символов (YOLOv8x, ~40 эпох, ~320x320)
     "symbols": {
-        "data_yaml": "dataset/symbols/data.yaml",
+        "data_yaml": "dataset/data.yaml",
         "epochs": 40,
         "imgsz": 320,
-        "batch": 16,
+        "batch": 8,
         "model_size": "x",
         "project": "runs/symbols",
         "name": "symbols_yolov8x",
@@ -63,9 +63,9 @@ def check_cuda():
 
 def train_model(
     data_yaml="dataset/data.yaml",
-    epochs=100,
+    epochs=50,
     imgsz=640,
-    batch=16,
+    batch=8,
     device=None,
     model_size="n",  # n, s, m, l, x
     project="runs/detect",

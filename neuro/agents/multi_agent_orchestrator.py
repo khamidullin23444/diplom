@@ -281,7 +281,7 @@ class MultiAgentOrchestrator:
 
 def create_multi_agent_pipeline(
     ocr_model_path: str = "runs/detect/old_tatar_yolov8/weights/best.pt",
-    ocr_conf_threshold: float = 0.25,
+    ocr_conf_threshold: float = 0.1,
     llm_model_name: str = "neurotatarlar/tweety-tatar-base",
     llm_model_type: str = "huggingface",
     llm_device: Optional[str] = None
